@@ -9,6 +9,7 @@
 | 层 | 说明 | Skills |
 | --- | --- | --- |
 | [`herdr/`](herdr/) | 在 [Herdr](https://herdr.dev) 终端复用器里编排并行 agent | `herdr-dispatch`、`herdr-monitor` |
+| [`normal/`](normal/) | 不绑定外部工具的日常 skill，目前是两种解释语域 | `explaining-mechanisms-progressively`、`human-words` |
 
 ## 安装
 
