@@ -1,33 +1,33 @@
 # normal
 
-不绑定任何外部工具的日常 skill —— 跟 [`herdr/`](../herdr/) 不同，装上就能用，不需要先跑在某个环境里。
+Everyday skills that are not tied to any external tool — unlike [`herdr/`](../herdr/), they work the moment they are installed, with no environment to be inside of first.
 
-目前这一层的两个 skill 是同一件事的两个语域：**把一个东西讲清楚**。区别只在于讲的是谁的东西。
+Right now this layer holds two registers of the same activity: **making something clear**. The only difference is whose thing is being explained.
 
-| Skill | 干什么 |
+| Skill | What it does |
 | --- | --- |
-| [`explaining-mechanisms-progressively`](explaining-mechanisms-progressively/) | 讲**不是我们写的**机制：一行语法、一个 syscall、一个 API primitive 底层到底发生了什么。先在内部把比喻和真实术语逐词对照验一遍，通过了再输出，比喻和术语映射一次给全。 |
-| [`human-words`](human-words/) | 讲**我们自己系统**的规则：一条业务规则、一段工作流，讲给一个永远不会打开代码的人听。领先讲结论和影响，走一个具体的例子，直奔边界情况，说清楚谁付钱、谁看得见。 |
+| [`explaining-mechanisms-progressively`](explaining-mechanisms-progressively/) | Explains mechanisms **we did not write**: what a line of syntax, a syscall, or an API primitive actually does underneath. Verifies the analogy against the real terminology word by word internally, and only then ships — analogy and term mapping together, in one message. |
+| [`human-words`](human-words/) | Explains **our own system's** rules: a business rule, a workflow, told to someone who will never open the code. Leads with the rule and its consequence, walks one concrete case, goes straight to the edge cases, and says who pays and what they see. |
 
-## 两者的分界
+## Where the line falls
 
-`human-words` 自己的第 5 节写了这条线，判据是一句话：
+`human-words` draws the line itself in its section 5, and the test is a single question:
 
-> **这个答案换一家公司还成立吗？**
-> 成立 → `explaining-mechanisms-progressively`（`with` 语句怎么工作、fork 复制了什么）。
-> 不成立 → `human-words`（一条片子从上传到导出经历了什么、这次为什么没扣费）。
+> **Would this answer still be true at another company?**
+> Yes → `explaining-mechanisms-progressively` (how `with` works, what `fork` copies).
+> No → `human-words` (what happens to a clip between upload and export, why this run wasn't charged).
 
-通用概念可以作为支撑句出现在 `human-words` 里 —— 用一句大白话定义完就往下走，别让它变成主题。
+A general concept may appear inside `human-words` as a supporting sentence — define it in one plain sentence, use it, move on. Just don't let it become the subject.
 
-## 触发方式是刻意不对称的
+## The asymmetric triggers are deliberate
 
-- `explaining-mechanisms-progressively` 靠 `description` 自动触发，问了就走。
-- `human-words` **只认手打的 `/human-words`**。用户说「没懂」不算，话题看着绕不算，你正准备写一大段解释也不算 —— 那些都是普通回答。这个 skill 是用户主动换语域，只有他能叫。
+- `explaining-mechanisms-progressively` fires automatically off its `description`. Ask, and it runs.
+- `human-words` answers **only to a typed `/human-words`**. The user saying they didn't follow doesn't count, a topic looking tangled doesn't count, and neither does you being about to write a long explanation anyway — those are ordinary replies. This skill is the user deliberately switching register, and only they get to call it.
 
-写自己的 skill 时这个对比值得记：能自动触发的，是判据客观、误触发代价低的；只能手动触发的，是那种「模型觉得该用」和「用户想要」经常对不上的。
+The contrast is worth keeping in mind when writing your own: the skills safe to auto-trigger are the ones with an objective test and a cheap false positive. The ones that have to stay manual are the ones where "the model thinks this applies" and "the user wants this" keep failing to line up.
 
-## 共同的坑
+## Shared traps
 
-- **比喻要先自检再出手**。别把第一个想到的比喻直接扔出去 —— 把比喻里每个名词换成真实术语再读一遍，有句子变成假的就说明比喻错了。这个循环在内部跑完，不要讲给用户听。
-- **别照着调用链讲**。「先调 A，A 再调 B，B 写进 C」是最常见的失败。读者手里没有调用图，也不想要。
-- **通俗不等于含糊**。一个细节如果会改变读者的判断，就得留着，用大白话说出来。
+- **Self-check the analogy before it leaves.** Don't ship the first analogy that comes to mind — swap every noun in it for the real term and read it back; if a sentence turns false, the analogy is wrong. Run that loop internally and don't narrate it.
+- **Don't narrate the call graph.** "A calls B, B writes to C" is the most common failure. The reader has no call graph and doesn't want one.
+- **Plain is not vague.** If a detail would change what the reader decides, keep it — and say it in plain words.

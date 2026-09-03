@@ -1,20 +1,20 @@
 # herdr
 
-在 [Herdr](https://herdr.dev)（面向 coding agent 的终端复用器）里把任务分派给并行的 Claude Code 会话，并把它们盯到收工。
+Hand work off to parallel Claude Code sessions inside [Herdr](https://herdr.dev) — a terminal multiplexer built for coding agents — and watch them through to the finish.
 
-两个 skill 都要求运行在 Herdr 内部（`HERDR_ENV=1`），否则直接停手，不从外部去遥控 Herdr。
+Both skills require running inside Herdr (`HERDR_ENV=1`); otherwise they stop, rather than try to drive Herdr from the outside.
 
-| Skill | 干什么 |
+| Skill | What it does |
 | --- | --- |
-| [`herdr-dispatch`](herdr-dispatch/) | 把当前会话已经谈定的方向写成自足的 brief，开一个同级 pane，起一个新的 Claude Code，把 brief 原子地投进去，然后交出 handle 就撒手。 |
-| [`herdr-monitor`](herdr-monitor/) | 后台盯着本会话派出去的 agent，谁停下来就读、判断、再推一把。只有两种情况才回头找人：子 agent 缺一个它自己给不了的权限，或者遇到真正重大 / 不可逆的决定。 |
+| [`herdr-dispatch`](herdr-dispatch/) | Turns a direction already settled in the current session into a self-contained brief, opens a sibling pane, starts a fresh Claude Code in it, delivers the brief atomically, then reports a handle and lets go. |
+| [`herdr-monitor`](herdr-monitor/) | Watches the agents this session dispatched: when one stops, read it, decide, push it onward. Only two things send it back to a human — the child needs a permission it cannot grant itself, or a genuinely major / irreversible decision is on the table. |
 
-## 两者的分工
+## How the two divide up
 
-`dispatch` 的契约到「报出 handle」为止 —— **它绝不自动接 `monitor`**。想盯着，是一次单独的、明确的请求（`/herdr-monitor`）。这条边界写在 `herdr-monitor` 的第 0 节，是刻意的：派活和看活是两件事，混在一起会让每次派活都拖出一个没人要的后台监控。
+`dispatch`'s contract ends at "here is the handle" — **it never chains into `monitor` on its own**. Watching is a separate, explicit request (`/herdr-monitor`). That boundary is written into section 0 of `herdr-monitor` deliberately: dispatching and supervising are two different jobs, and fusing them makes every dispatch drag along a background monitor nobody asked for.
 
-## 共同的坑
+## Shared traps
 
-- **分组前缀**：一个主会话派出去的所有 agent 共用一个前缀（取自派发方 tab 的 label），所以 `herdr agent list | grep '<prefix>/'` 能一把捞出来。前缀不从任务名推导 —— 任务会变，会话不会。
-- **投递要原子**：用 `herdr agent prompt --wait --until working`，别用 send-keys 拼。`--wait` 超时 ≠ 没送到，先 `agent get` 再说，盲目重发会投两遍。
-- **composer 里的文字不是用户输入**：Claude Code 会在输入行渲染 ghost 提示文本，`read` 分辨不出来。别把它当成人类打的字，也别对不是自己注入的文本按回车。
+- **The group prefix.** Every agent dispatched by one main session shares a prefix taken from the dispatching tab's label, so `herdr agent list | grep '<prefix>/'` pulls them all back in one go. The prefix is not derived from the task name — tasks change, the session does not.
+- **Delivery must be atomic.** Use `herdr agent prompt --wait --until working`, not hand-rolled send-keys. A `--wait` timeout does not mean the prompt failed to land: check `agent get` first, because blindly resending delivers it twice.
+- **Text in the composer is not user input.** Claude Code renders ghost hint text on the input line, and `read` cannot tell the difference. Do not treat it as something a human typed, and do not hit enter on text you did not inject yourself.
