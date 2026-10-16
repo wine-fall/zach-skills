@@ -33,15 +33,36 @@ Resolve it once per session, in this order:
    herdr tab list --workspace "${HERDR_PANE_ID%%:*}"   # take the row whose tab_id matches this pane's tab
    ```
 
-   `[aip-main]` → prefix `aip-main`. This is the default: it is the user's own naming, it names the main session rather than the moment, and it does not drift.
+   `[api-main]` → prefix `api-main`. This is the default: it is the user's own naming, it names the main session rather than the moment, and it does not drift.
 3. **Tab unlabeled** → fall back to the dispatching pane id minus the workspace part (`w3:p1B` → `p1B`), and say so in the hand-back, so the user can label the tab if they want something readable.
+
+**Cap: 11 characters.** A prefix is a grouping handle, not a description — it rides in front of every label, so it stays short. Normalize whatever the source gives you, by this exact recipe, so the same session always produces the same prefix:
+
+1. Strip brackets and surrounding whitespace; lowercase; collapse each run of internal whitespace to a single `-`.
+2. **≤ 11 characters → done.**
+3. Otherwise drop whole `-`-separated segments off the end until it fits — a truncated word is unreadable, a dropped word is not.
+4. If the first segment alone still exceeds 11, hard-cut it to 11 characters.
+5. Strip any trailing `-`.
+
+Count **characters, not bytes** — a CJK label is three bytes per character and would otherwise be cut to nonsense.
+
+| Source label | Prefix |
+| --- | --- |
+| `[api-main]` | `api-main` |
+| `[cache layer rework]` | `cache-layer` |
+| `[roadmap draft]` | `roadmap` |
+| `Data Export — 剩余问题讲解` | `data-export` |
+
+The cap applies to a prefix **you were given in the args** too. Shorten it the same way and say what you shortened it to, rather than silently carrying an over-long one.
+
+**Stability beats freshness.** If this conversation has already dispatched under a prefix, reuse that exact string for every later dispatch — even if the tab has since been renamed. A prefix that changes mid-session splits one group into two, which is the whole thing it exists to prevent.
 
 **Never derive the prefix from the task.** One main session dispatches many unrelated tasks; a task-shaped prefix stops grouping them the moment the topic moves on.
 
 Apply it in two places:
 
-- **Agent / pane label — always**: `<prefix>/<task-label>`, e.g. `aip-main/aip2328-prod-flip`. This is what makes a flat listing groupable: `herdr agent list | grep 'aip-main/'`.
-- **Tab label — whenever the dispatch lands in a NEW tab**: `[<prefix>] <task-label>`, e.g. `[aip-main] aip2328-prod-flip`, matching the bracketed convention already in use.
+- **Agent / pane label — always**: `<prefix>/<task-label>`, e.g. `api-main/api412-flag-flip`. This is what makes a flat listing groupable: `herdr agent list | grep 'api-main/'`.
+- **Tab label — whenever the dispatch lands in a NEW tab**: `[<prefix>] <task-label>`, e.g. `[api-main] api412-flag-flip`, matching the bracketed convention already in use.
 
 ## 2. Place the agent — same-tab right column by default, a new tab only when it must
 
@@ -101,7 +122,7 @@ Subsequent `agent` commands target `<task-label>` (or the pane id). If startup n
 
 The child is a fresh session: it cannot see this conversation. The brief must be **self-contained**, written as **one single line** (raw newlines in submitted text risk odd composer behavior). Checklist:
 
-- **Lead with a slash command when one fits** the task end-to-end (e.g. `/aip-ship <brief>`), so the child enters the right workflow immediately.
+- **Lead with a slash command when one fits** the task end-to-end (e.g. `/ship-it <brief>`), so the child enters the right workflow immediately.
 - **Task** — what to deliver, and that design is already settled ("按此执行不必重开设计") when it is.
 - **Background facts** with anchors: file:line, PR numbers, URLs, measured results. Facts you verified, stated as verified.
 - **Decisions already made** — enumerate them so the child doesn't re-litigate.

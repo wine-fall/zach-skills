@@ -23,7 +23,7 @@ Not in Herdr → say so and stop.
 
 Decide **which** agents to watch, in this order:
 
-1. **Names given in the args** (`/herdr-monitor aip2328-prod-flip`) → watch exactly those.
+1. **Names given in the args** (`/herdr-monitor api412-flag-flip`) → watch exactly those.
 2. **No args** → the agents this conversation dispatched, by the label you gave them at dispatch.
 3. **Neither is known** → fall back to *same-tab siblings*: every agent whose `tab_id` equals this pane's `tab_id`, minus `$HERDR_PANE_ID`. Dispatched panes are splits of this tab, so this is exact, not a guess. Verify with `herdr agent list` and name the agents back to the user before arming.
 
@@ -36,7 +36,7 @@ One `Monitor` call, `persistent: true`. The script polls `herdr agent list` and 
 Set `WATCH` to a space-separated list of agent names, or leave it empty for the same-tab fallback.
 
 ```bash
-WATCH="aip2328-prod-flip" python3 -u - <<'PY'
+WATCH="api412-flag-flip" python3 -u - <<'PY'
 import json, os, subprocess, time
 
 WATCH = [n for n in os.environ.get("WATCH", "").split() if n]
@@ -93,7 +93,7 @@ while True:
 PY
 ```
 
-`description`: name the panes, e.g. `dispatched agent aip2328-prod-flip`.
+`description`: name the panes, e.g. `dispatched agent api412-flag-flip`.
 
 Coverage note: the filter emits on `blocked`, `idle`, `done`, on disappearance, and on a stall — every way a child can stop being productive. Do **not** narrow it to `done`; a crashed or permission-blocked child would then look identical to one still working.
 
