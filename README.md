@@ -8,7 +8,7 @@ A skill is a directory plus a `SKILL.md` — the `name` and `description` in its
 
 | Layer | What it's for | Skills |
 | --- | --- | --- |
-| [`herdr/`](herdr/) | Orchestrating parallel agents inside the [Herdr](https://herdr.dev) terminal multiplexer | `herdr-dispatch`, `herdr-monitor` |
+| [`herdr/`](herdr/) | Orchestrating parallel agents inside the [Herdr](https://herdr.dev) terminal multiplexer | `herdr-dispatch`, `herdr-remote-dispatch`, `herdr-monitor` |
 | [`normal/`](normal/) | Everyday skills that need no external tool — currently two registers for explaining things | `explaining-mechanisms-progressively`, `human-words` |
 
 ## Install
@@ -27,7 +27,7 @@ for d in ~/src/zach-skills/herdr/*/; do
 done
 ```
 
-Once installed, call them directly as `/herdr-dispatch`, `/herdr-monitor`, or let Claude fire them on its own from the `description`.
+Once installed, call them directly as `/herdr-dispatch`, `/herdr-remote-dispatch`, `/herdr-monitor`, or let Claude fire them on its own from the `description`.
 
 ## Conventions
 
